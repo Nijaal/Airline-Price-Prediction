@@ -1,6 +1,8 @@
 install.packages("readxl")
+install.packages("superml")
  
 library("readxl")
+library("superml")
 setwd("C:\\Users\\Acer\\OneDrive\\Desktop\\R Project\\Airline Fair Prediction")
 
 df = read_excel("train.xlsx")
@@ -11,7 +13,9 @@ str(df)
 summary(df)
 summary(is.na(df))
 
-#Dealing with missing values
+miss = which(is.na(df))
+df[miss,]
+#Handling missing values
 df = na.omit(df)
 summary(is.na(df))
 
@@ -46,6 +50,20 @@ for (each in df$Duration) {
 }
 df["Duration (in mins)"] <- duration
 
+dates <- c()
+for (each in df$Date_of_Journey) {
+  date <- as.Date(each,"%d/%m/%Y")
+  dates <- c(dates, date)
+}
+df$`Date of Journey` <- dates
+df$`Date of Journey` <- as.Date(df$`Date of Journey`,origin = "1970-01-01")
+
+unique(df$Airline)
+lb = LabelEncoder$new()
+lb$fit(df$Airline)
+df$Airline = lb$fit_transform(df$Airline)
+
 #Dropping columns which are of no use
-data <- subset(df, select = -c(Route,Dep_Time,Arrival_Time,`Additional Info`,Duration))
+data <- subset(df, select = -c(Route,Dep_Time,Arrival_Time,`Additional Info`,Duration,Source,Destination,Date_of_Journey))
 View(data)
+
